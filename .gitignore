@@ -1,171 +1,493 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-.pybuilder/
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# UV
-#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#uv.lock
-
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#pdm.lock
-#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
-#   in version control.
-#   https://pdm.fming.dev/latest/usage/project/#working-with-version-control
-.pdm.toml
-.pdm-python
-.pdm-build/
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
-
-# PyPI configuration file
-.pypirc
+ 
+ import os 
+ import sys 
+ from platform import system 
+ from PyQt5 import QtGui 
+ from PyQt5 import uic 
+ from PyQt5.QtCore import Qt 
+ from PyQt5.QtGui import QPalette, QColor 
+ from PyQt5.QtWidgets import QInputDialog, QLineEdit, QStyleFactory, QDesktopWidget 
+ from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QFileDialog 
+ import main 
+ 
+ # Application root location ↓ 
+ if system() == "Windows": 
+    appFolder = os.path.dirname(os.path.realpath(sys.argv[0])) + "\\" 
+ elif system() == "Linux": 
+    appFolder = os.path.dirname(os.path.realpath(sys.argv[0])) + "//" 
+ 
+ 
+ class App(QMainWindow): 
+    def init(self): 
+        """Constructor.""" 
+        super(App, self).init() 
+        uic.loadUi(appFolder + "ImaP.ui", self)  # Load the UI(User Interface) file. 
+        self.makeWindowCenter() 
+        self.run_system()  # main operating function of this GUI FIle 
+        # Status Bar Message 
+        self.statusBar().showMessage("CONVERT your IMAGE files to PDF(Portable Document Format).") 
+        self.setWindowTitle("IMAGE-TO-PDF CONVERTOR") 
+ 
+    def makeWindowCenter(self): 
+        """For launching windows in center.""" 
+        qtRectangle = self.frameGeometry() 
+        centerPoint = QDesktopWidget().availableGeometry().center() 
+        qtRectangle.moveCenter(centerPoint) 
+        self.move(qtRectangle.topLeft()) 
+ 
+    def run_system(self): 
+        """Main load function""" 
+        self.pushButton.clicked.connect(self.add_folder_button_on_click) 
+        self.pushButton_add.clicked.connect(self.add_images_button_on_click) 
+        self.pushButton_remove.clicked.connect(self.remove_button_on_click) 
+        self.pushButton_up.clicked.connect(self.up_button_on_click) 
+        self.pushButton_down.clicked.connect(self.down_button_on_click) 
+        self.pushButton_make_pdf.clicked.connect(self.make_pdf_button_on_click) 
+        self.pushButton_clear.clicked.connect(self.clear_button_on_click) 
+ 
+    def add_folder_button_on_click(self): 
+        """Add a Folder button""" 
+ 
+        dir_path = QFileDialog.getExistingDirectory(self, 'Open File') 
+ 
+        if dir_path != "": 
+            dir_files = main.make_pdf_all(dir_path) 
+            for i in dir_files: 
+11 
+ 
+                next_row = self.listWidget.count() 
+                self.listWidget.insertItem(next_row, i) 
+        else: 
+            return 
+ 
+    def add_images_button_on_click(self): 
+        file_name = QFileDialog.getOpenFileName(self, "Open File") 
+        next_row = self.listWidget.count() 
+        if file_name[0] != "": 
+            self.listWidget.insertItem(next_row, file_name[0]) 
+ 
+    def remove_button_on_click(self): 
+        current_row = self.listWidget.currentRow() 
+        item = self.listWidget.item(current_row) 
+        if item is None: 
+            pass 
+ 
+        else: 
+ 
+ 
+ 
+            get_reply = QMessageBox.question(self, "Remove An Image File", "Do you want to remove " +     
+str(item.text()) 
+                                             + " from the list?", QMessageBox.Yes | QMessageBox.No) 
+            if get_reply == QMessageBox.Yes: 
+                element = self.listWidget.takeItem(current_row) 
+                del element 
+            else: 
+                pass 
+ 
+    def up_button_on_click(self): 
+        current_row = self.listWidget.currentRow() 
+        if current_row >= 1: 
+            item = self.listWidget.takeItem(current_row) 
+            self.listWidget.insertItem(current_row - 1, item) 
+            self.listWidget.setCurrentItem(item) 
+ 
+    def down_button_on_click(self): 
+        current_row = self.listWidget.currentRow() 
+        if current_row < self.listWidget.count() - 1: 
+            item = self.listWidget.takeItem(current_row) 
+            self.listWidget.insertItem(current_row + 1, item) 
+            self.listWidget.setCurrentItem(item) 
+ 
+    def clear_button_on_click(self): 
+        reply = QMessageBox.question(self, "Clear List Box", "Do you want to clear all the selections?", 
+                                     QMessageBox.Yes | QMessageBox.No) 
+        if reply == QMessageBox.Yes: 
+            self.listWidget.clear() 
+ 
+    def make_pdf_button_on_click(self): 
+        if self.listWidget.count() == 0: 
+            reply = QMessageBox.information(self, "Warning!", "List box is empty! Add files to list box first.", 
+                                            QMessageBox.Ok) 
+ 
+        else: 
+            items_list = [] 
+            for i in range(self.listWidget.count()): 
+                items_list.append(str(self.listWidget.item(i).text())) 
+12 
+ 
+ 
+            pdf_name, ok = QInputDialog.getText(self, "PDF Name", "Give A Name To Your PDF File",               
+QLineEdit.Normal) 
+            if pdf_name == "": 
+                QMessageBox.information(self, "Alert", "Please Give Your PDF a name.", QMessageBox.Ok) 
+                return 
+            if ok and pdf_name is not None: 
+                reply = QMessageBox.information(self, "PDF Location", "Let's Select A Destination " 
+                                                                      "To Save Your PDF File!", QMessageBox.Ok) 
+ 
+                if reply == QMessageBox.Ok: 
+ 
+                    pdf_location = QFileDialog.getExistingDirectory(self, 'Open File') 
+                    pdf_name += ".pdf" 
+                    if pdf_location == "": 
+                        return 
+                    main.make_pdf_only_selected(items_list, pdf_name, pdf_location) 
+                    last_reply = QMessageBox.information(self, "Done!", "Hurrah! Your PDF is ready! " 
+                                                                        "Go to your selected location to find " 
+                                                                        "the PDF.", QMessageBox.Ok) 
+                    if last_reply == QMessageBox.Ok: 
+                        pass 
+                else: 
+                    return 
+ if name == 'main': 
+    app = QApplication(sys.argv) 
+ 
+    app.setStyle(QStyleFactory.create("Fusion")) 
+ 
+    darkPalette = QtGui.QPalette() 
+    darkColor = QColor(45, 45, 45) 
+    disabledColor = QColor(127, 127, 127) 
+    darkPalette.setColor(QPalette.Window, darkColor) 
+    darkPalette.setColor(QPalette.WindowText, Qt.white) 
+    darkPalette.setColor(QPalette.Base, QColor(40, 40, 40)) 
+    darkPalette.setColor(QPalette.AlternateBase, darkColor) 
+    darkPalette.setColor(QPalette.ToolTipBase, Qt.white) 
+    darkPalette.setColor(QPalette.ToolTipText, Qt.white) 
+    darkPalette.setColor(QPalette.Text, Qt.white) 
+    darkPalette.setColor(QPalette.Disabled, QPalette.Text, disabledColor) 
+    darkPalette.setColor(QPalette.Button, darkColor) 
+    darkPalette.setColor(QPalette.ButtonText, Qt.white) 
+    darkPalette.setColor(QPalette.Disabled, QPalette.ButtonText, disabledColor) 
+    darkPalette.setColor(QPalette.BrightText, Qt.red) 
+    darkPalette.setColor(QPalette.Link, QColor(42, 130, 218)) 
+    darkPalette.setColor(QPalette.Highlight, QColor(42, 130, 218)) 
+    darkPalette.setColor(QPalette.HighlightedText, Qt.black) 
+    darkPalette.setColor(QPalette.Disabled, QPalette.HighlightedText, disabledColor) 
+ 
+    app.setPalette(darkPalette) 
+    app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }") 
+ 
+    run_main = App()  # Instantiate The App() class 
+    run_main.show() 
+    sys.exit(app.exec_()) 
+ 
+     
+ 
+ 
+13 
+ 
+  IMAGE TO PDF PY  
+ 
+import os 
+import sys 
+from platform import system 
+from PyQt5 import QtGui 
+from PyQt5 import uic 
+from PyQt5.QtCore import Qt 
+from PyQt5.QtGui import QPalette, QColor 
+from PyQt5.QtWidgets import QInputDialog, QLineEdit, QStyleFactory, QDesktopWidget 
+from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QFileDialog 
+import sqlite3 
+import main 
+ 
+# Application root location ↓ 
+if system() == "Windows": 
+    appFolder = os.path.dirname(os.path.realpath(sys.argv[0])) + "\\" 
+elif system() == "Linux": 
+    appFolder = os.path.dirname(os.path.realpath(sys.argv[0])) + "//" 
+ 
+# SQLite database setup 
+DATABASE_NAME = 'image_to_pdf.db' 
+ 
+class App(QMainWindow): 
+    def init(self): 
+        """Constructor.""" 
+        super(App, self).init() 
+        uic.loadUi(appFolder + "ImaP.ui", self)  # Load the UI(User Interface) file. 
+        self.makeWindowCenter() 
+        self.run_system()  # main operating function of this GUI FIle 
+        # Status Bar Message 
+        self.statusBar().showMessage("CONVERT your IMAGE files to PDF(Portable Document Format).") 
+        self.setWindowTitle("IMAGE-TO-PDF CONVERTOR") 
+ 
+        # Create a database connection 
+        self.conn = sqlite3.connect(DATABASE_NAME) 
+        self.cursor = self.conn.cursor() 
+ 
+        # Create a table if it doesn't exist 
+        self.cursor.execute(''' 
+            CREATE TABLE IF NOT EXISTS image_paths ( 
+                id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                path TEXT NOT NULL 
+            ) 
+        ''') 
+ 
+        # Commit changes 
+        self.conn.commit() 
+ 
+    def makeWindowCenter(self): 
+        """For launching windows in center.""" 
+        qtRectangle = self.frameGeometry() 
+        centerPoint = QDesktopWidget().availableGeometry().center() 
+        qtRectangle.moveCenter(centerPoint) 
+        self.move(qtRectangle.topLeft()) 
+ 
+    def run_system(self): 
+        """Main load function""" 
+        self.pushButton.clicked.connect(self.add_folder_button_on_click) 
+14 
+ 
+        self.pushButton_add.clicked.connect(self.add_images_button_on_click) 
+        self.pushButton_remove.clicked.connect(self.remove_button_on_click) 
+        self.pushButton_up.clicked.connect(self.up_button_on_click) 
+        self.pushButton_down.clicked.connect(self.down_button_on_click) 
+        self.pushButton_make_pdf.clicked.connect(self.make_pdf_button_on_click) 
+        self.pushButton_clear.clicked.connect(self.clear_button_on_click) 
+ 
+    def add_folder_button_on_click(self): 
+        """Add a Folder button""" 
+ 
+        dir_path = QFileDialog.getExistingDirectory(self, 'Open File') 
+ 
+        if dir_path != "": 
+            dir_files = main.make_pdf_all(dir_path) 
+            for i in dir_files: 
+                next_row = self.listWidget.count() 
+                self.listWidget.insertItem(next_row, i) 
+ 
+                # Insert path into the database 
+                self.insert_into_database(i) 
+        else: 
+            return 
+ 
+    def add_images_button_on_click(self): 
+        file_name = QFileDialog.getOpenFileName(self, "Open File") 
+        next_row = self.listWidget.count() 
+        if file_name[0] != "": 
+            self.listWidget.insertItem(next_row, file_name[0]) 
+ 
+            # Insert path into the database 
+            self.insert_into_database(file_name[0]) 
+ 
+    def remove_button_on_click(self): 
+        current_row = self.listWidget.currentRow() 
+        item = self.listWidget.item(current_row) 
+        if item is None: 
+            pass 
+        else: 
+            get_reply = QMessageBox.question(self, "Remove An Image File", 
+                                             f"Do you want to remove {item.text()} from the list?", 
+                                             QMessageBox.Yes | QMessageBox.No) 
+            if get_reply == QMessageBox.Yes: 
+                # Remove path from the database 
+                self.remove_from_database(item.text()) 
+ 
+                element = self.listWidget.takeItem(current_row) 
+                del element 
+            else: 
+                pass 
+ 
+    def up_button_on_click(self): 
+        current_row = self.listWidget.currentRow() 
+        if current_row >= 1: 
+            item = self.listWidget.takeItem(current_row) 
+            self.listWidget.insertItem(current_row - 1, item) 
+            self.listWidget.setCurrentItem(item) 
+ 
+    def down_button_on_click(self): 
+        current_row = self.listWidget.currentRow() 
+15 
+ 
+        if current_row < self.listWidget.count() - 1: 
+            item = self.listWidget.takeItem(current_row) 
+            self.listWidget.insertItem(current_row + 1, item) 
+            self.listWidget.setCurrentItem(item) 
+ 
+    def clear_button_on_click(self): 
+        reply = QMessageBox.question(self, "Clear List Box", "Do you want to clear all the selections?", 
+                                     QMessageBox.Yes | QMessageBox.No) 
+        if reply == QMessageBox.Yes: 
+            # Clear all data from the database 
+            self.clear_database() 
+            self.listWidget.clear() 
+ 
+    def insert_into_database(self, path): 
+        """Insert path into the database.""" 
+        self.cursor.execute(''' 
+            INSERT INTO image_paths (path) VALUES (?) 
+        ''', (path,)) 
+        self.conn.commit() 
+ 
+    def remove_from_database(self, path): 
+        """Remove path from the database.""" 
+        self.cursor.execute(''' 
+            DELETE FROM image_paths WHERE path = ? 
+        ''', (path,)) 
+        self.conn.commit() 
+ 
+    def clear_database(self): 
+        """Clear all data from the database.""" 
+        self.cursor.execute('DELETE FROM image_paths') 
+        self.conn.commit() 
+ 
+    def make_pdf_button_on_click(self): 
+        if self.listWidget.count() == 0: 
+            reply = QMessageBox.information(self, "Warning!", "List box is empty! Add files to list box first.", 
+                                            QMessageBox.Ok) 
+        else: 
+            items_list = [str(self.listWidget.item(i).text()) for i in range(self.listWidget.count())] 
+            pdf_name, ok = QInputDialog.getText(self, "PDF Name", "Give A Name To Your PDF File", 
+QLineEdit.Normal) 
+            if pdf_name == "": 
+                QMessageBox.information(self, "Alert", "Please Give Your PDF a name.", QMessageBox.Ok) 
+                return 
+            if ok and pdf_name is not None: 
+                reply = QMessageBox.information(self, "PDF Location", "Let's Select A Destination " 
+                                                                      "To Save Your PDF File!", QMessageBox.Ok) 
+                if reply == QMessageBox.Ok: 
+                    pdf_location = QFileDialog.getExistingDirectory(self, 'Open File') 
+                    pdf_name += ".pdf" 
+                    if pdf_location == "": 
+                        return 
+                    main.make_pdf_only_selected(items_list, pdf_name, pdf_location) 
+                    last_reply = QMessageBox.information(self, "Done!", "Hurrah! Your PDF is ready! " 
+                                                                        "Go to your selected location to find " 
+                                                                        "the PDF.", QMessageBox.Ok) 
+                    if last_reply == QMessageBox.Ok: 
+                        pass 
+                else: 
+                    return 
+16 
+ 
+ 
+ 
+if name == 'main': 
+    app = QApplication(sys.argv) 
+ 
+    app.setStyle(QStyleFactory.create("Fusion")) 
+ 
+    darkPalette = QtGui.QPalette() 
+    darkColor = QColor(45, 45, 45) 
+    disabledColor = QColor(127, 127, 127) 
+    darkPalette.setColor(QPalette.Window, darkColor) 
+    darkPalette.setColor(QPalette.WindowText, Qt.white) 
+    darkPalette.setColor(QPalette.Base, QColor(40, 40, 40)) 
+    darkPalette.setColor(QPalette.AlternateBase, darkColor) 
+    darkPalette.setColor(QPalette.ToolTipBase, Qt.white) 
+    darkPalette.setColor(QPalette.ToolTipText, Qt.white) 
+    darkPalette.setColor(QPalette.Text, Qt.white) 
+    darkPalette.setColor(QPalette.Disabled, QPalette.Text, disabledColor) 
+    darkPalette.setColor(QPalette.Button, darkColor) 
+    darkPalette.setColor(QPalette.ButtonText, Qt.white) 
+    darkPalette.setColor(QPalette.Disabled, QPalette.ButtonText, disabledColor) 
+    darkPalette.setColor(QPalette.BrightText, Qt.red) 
+    darkPalette.setColor(QPalette.Link, QColor(42, 130, 218)) 
+    darkPalette.setColor(QPalette.Highlight, QColor(42, 130, 218)) 
+    darkPalette.setColor(QPalette.HighlightedText, Qt.black) 
+    darkPalette.setColor(QPalette.Disabled, QPalette.HighlightedText, disabledColor) 
+ 
+    app.setPalette(darkPalette) 
+    app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }") 
+ 
+    run_main = App()  # Instantiate The App() class 
+    run_main.show() 
+    sys.exit(app.exec_()) 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+MAIN.PY 
+ 
+ 
+from PIL import Image 
+import os 
+import platform 
+ 
+def make_pdf_all(dir_path): 
+    if platform.system() == "Windows": 
+        join = str("/") 
+        dir_files = [dir_path + join + f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))] 
+        return dir_files 
+ 
+    elif platform.system() == "Linux": 
+        join = str('\'') 
+17 
+ 
+        dir_files = [dir_path + join + f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))] 
+        return dir_files 
+ 
+def make_pdf_only_selected(selected_files, file_name, pdf_location): 
+    images_list = [] 
+    for f in selected_files: 
+        try: 
+            images_list.append((Image.open(f)).convert('RGB')) 
+        except IOError: 
+            pass 
+    os.chdir(pdf_location) 
+    images_list[0].save(file_name, save_all=True, append_images=images_list[1:]) 
+ 
+if name == 'main': 
+    print("This Is The Main Backend Module!") 
+ 
+ 
+ 
+<div> 
+  <h1><strong>Imap: Image To PDF Converter (Desktop Application For Windows)</strong></h1> 
+  <div> 
+  <!-- Version --> 
+   <img src="https://img.shields.io/badge/version-1.0-blue" alt="website"> 
+  
+  <!-- Build --> 
+  <img src="https://img.shields.io/badge/build-passed-brightgreen" alt="LICENSE"> 
+  <!-- License --> 
+  <a href="LICENSE"> 
+    <img src="https://img.shields.io/badge/license-MIT-red" alt="LICENSE"> 
+  </a> 
+  <!-- Warning --> 
+  <img src="https://img.shields.io/badge/NOTICE-%20released%20-green" alt="LICENSE"> 
+</div> 
+ 
+  [!["Buy Me A 
+Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com
+ /sakibkhaninan) 
+ 
+  <p>This is an "Image to PDF Converter" (open source) software build for Windows. You can convert your image files 
+to 
+PDF(Portable Document Format) files using this software. Just select your image files or the folder containing the 
+images and convert them all into PDF file 
+quickly.</p> 
+  <br> 
+  <p>Built With: Python 3.7, PyQT5, PILLOW / PIL (Python Image Library).</p> 
+<p>Icons Credit: <a href ="https://icons8.com/">Icons8</a></p> 
+</div> 
+ 
+<br> 
+ 
+ 
+ 
+<div> 
+  <sub>This Image to PDF Converter Software Tool is built by 
+    <a href="https://github.com/skinan/">Muhammad Sakib Khan Inan</a> 
+  </sub> 
+</div> 
+</div> 
+ 
+18 
+ 
+## Screenshots 
+ 
+<p align="center"> 
+  <img src="screenshots/home.jpg" alt="Home Window"/> 
+  <img src="screenshots/about.jpg" alt="About Window"/> 
+</p> 
+ 
+## Features 
+ - Add Folder Containing Images - Add Single Image Files To List - Remove Image Files From List - Dark Theme - Change The Order of Images to Make A PDF - Create A PDF at Your Desired Locatio
